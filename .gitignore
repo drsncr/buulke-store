@@ -5,6 +5,7 @@
 gradle/
 gradlew
 gradlew.bat
+build/
 .idea/
 
 # Log file

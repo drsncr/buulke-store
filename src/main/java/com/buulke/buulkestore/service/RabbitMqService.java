@@ -29,6 +29,6 @@ public class RabbitMqService {
     }
 
     public void sendRequestForQuestionGeneration(int quantity){
-        rabbitTemplate.convertAndSend("generationExchange", "generate.#", quantity);
+        rabbitTemplate.convertAndSend(String.valueOf(quantity));
     }
 }

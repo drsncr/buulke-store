@@ -10,6 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -23,12 +24,13 @@ public class QuestionService {
     RabbitMqService rabbitMqService;
 
     private Queue<Question> questions = new ArrayDeque<>();
-    private final Integer MAX_SIZE_OF_QUEUE;
-    private final Integer MIN_SIZE_OF_QUEUE;
+    private Integer minSizeOfQueue;
+    private Integer maxSizeOfQueue;
 
-    public QuestionService(){
-        MAX_SIZE_OF_QUEUE = Integer.parseInt(env.getProperty("queue.maxSize"));
-        MIN_SIZE_OF_QUEUE = Integer.parseInt(env.getProperty("queue.minSize"));
+    @PostConstruct
+    public void setMinMaxLimit(){
+        minSizeOfQueue = Integer.parseInt(env.getProperty("queue.minSize"));
+        maxSizeOfQueue = Integer.parseInt(env.getProperty("queue.maxSize"));
     }
 
     public void addQuestionToQueue(Question question){
@@ -43,8 +45,8 @@ public class QuestionService {
     }
 
     public void sendRequestForQuestionGeneration(){
-        if(this.questions.size() <= MIN_SIZE_OF_QUEUE) {
-            int diff = MAX_SIZE_OF_QUEUE - this.questions.size();
+        if(this.questions.size() <= minSizeOfQueue) {
+            int diff = maxSizeOfQueue - this.questions.size();
             rabbitMqService.sendRequestForQuestionGeneration(diff);
         }
     }

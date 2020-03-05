@@ -19,6 +19,9 @@ public class QuestionService {
     @Autowired
     private Environment env;
 
+    @Autowired
+    RabbitMqService rabbitMqService;
+
     private Queue<Question> questions = new ArrayDeque<>();
     private final Integer MAX_SIZE_OF_QUEUE;
     private final Integer MIN_SIZE_OF_QUEUE;
@@ -28,19 +31,21 @@ public class QuestionService {
         MIN_SIZE_OF_QUEUE = Integer.parseInt(env.getProperty("queue.minSize"));
     }
 
-    @RabbitListener(queues = "questionQueue1")
-    public void rabbitMqListener(String questionMessage) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Question question = objectMapper.readValue(questionMessage, Question.class);
-            questions.add(question);
-        }catch (JsonProcessingException ex){
-            System.out.println("questionMessage can not be parsed => " + ex.getMessage());
-        }
+    public void addQuestionToQueue(Question question){
+        questions.add(question);
+        System.out.println("question added");
     }
 
     public Question getQuestionFromQueue(){
         Question question = questions.poll();
+        this.sendRequestForQuestionGeneration();
         return question;
+    }
+
+    public void sendRequestForQuestionGeneration(){
+        if(this.questions.size() <= MIN_SIZE_OF_QUEUE) {
+            int diff = MAX_SIZE_OF_QUEUE - this.questions.size();
+            rabbitMqService.sendRequestForQuestionGeneration(diff);
+        }
     }
 }

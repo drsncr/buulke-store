@@ -17,19 +17,25 @@ public class RabbitMqConfiguration {
 
     @Bean
     DirectExchange exchange() {
-        String directExchangeName = env.getProperty("rabbitmq.directExchangeName");
+        String directExchangeName = env.getProperty("rabbitmq.topicExchangeName");
         return new DirectExchange(directExchangeName);
     }
 
     @Bean
     Queue queue() {
-        String queueName = env.getProperty("rabbitmq.queueName");
+        String queueName = env.getProperty("rabbitmq.orderQueueName");
         return new Queue(queueName, false);
     }
 
     @Bean
     Binding binding(DirectExchange exchange, Queue queue) {
-        String routingKey = env.getProperty("rabbitmq.routingKey");
+        String routingKey = env.getProperty("rabbitmq.orderRoutingKey");
         return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        return rabbitTemplate;
     }
 }

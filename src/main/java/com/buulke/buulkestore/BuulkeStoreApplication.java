@@ -21,7 +21,7 @@ public class BuulkeStoreApplication {
 
 	@PostConstruct
 	public void sendRequestForQuestionGenerationIfNeeded(){
-		questionService.sendRequestForQuestionGeneration();
+	    questionService.sendRequestForQuestionGeneration();
 	}
 
 }

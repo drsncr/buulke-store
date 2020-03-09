@@ -40,11 +40,11 @@ public class QuestionService {
 
     public Question getQuestionFromQueue(){
         Question question = questions.poll();
-        this.sendRequestForQuestionGeneration();
+        this.checkAndSendRequestForQuestionGeneration();
         return question;
     }
 
-    public void sendRequestForQuestionGeneration(){
+    public void checkAndSendRequestForQuestionGeneration(){
         if(this.questions.size() <= minSizeOfQueue) {
             int diff = maxSizeOfQueue - this.questions.size();
             rabbitMqService.sendRequestForQuestionGeneration(diff);

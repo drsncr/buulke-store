@@ -34,8 +34,9 @@ public class RabbitMqService {
     }
 
     public void sendRequestForQuestionGeneration(int quantity){
+        String exchange = env.getProperty("rabbitmq.topicExchangeName");
         String routingKey = env.getProperty("rabbitmq.orderRoutingKey");
-        rabbitTemplate.convertAndSend(routingKey, String.valueOf(quantity));
+        rabbitTemplate.convertAndSend(exchange, routingKey, String.valueOf(quantity));
         System.out.println("rabbitTemplate.convertAndSend() is called");
     }
 }
